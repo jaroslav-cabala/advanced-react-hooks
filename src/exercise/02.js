@@ -10,6 +10,29 @@ import {
   PokemonErrorBoundary,
 } from '../pokemon'
 
+function useSafeDispatch(dispatch) {
+  const mountedRef = React.useRef(false)
+
+  React.useLayoutEffect(() => {
+    mountedRef.current = true
+    return () => {
+      mountedRef.current = false
+    }
+  }, [])
+
+  return React.useCallback(
+    (...args) => {
+      if (mountedRef.current) {
+        console.log('update state')
+        dispatch(...args)
+      } else {
+        console.log('dispatch DO NOTHING')
+      }
+    },
+    [dispatch],
+  )
+}
+
 // 🐨 this is going to be our generic asyncReducer
 function asyncReducer(state, action) {
   console.log('-------------- reducer')
@@ -37,12 +60,14 @@ function asyncReducer(state, action) {
 
 function useAsync(initialState) {
   console.log('useAsync')
-  const [state, dispatch] = React.useReducer(asyncReducer, {
+  const [state, unsafeDispatch] = React.useReducer(asyncReducer, {
     status: 'idle',
     data: null,
     error: null,
     ...initialState,
   })
+
+  const dispatch = useSafeDispatch(unsafeDispatch)
 
   function run(promise) {
     console.log('run')
@@ -59,7 +84,7 @@ function useAsync(initialState) {
     )
   }
 
-  const runCallback = React.useCallback(run, [])
+  const runCallback = React.useCallback(run, [dispatch])
 
   return {state, run: runCallback}
 }
