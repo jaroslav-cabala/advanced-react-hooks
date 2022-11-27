@@ -11,7 +11,7 @@ import {
 } from '../pokemon'
 
 // 🐨 this is going to be our generic asyncReducer
-function pokemonInfoReducer(state, data) {
+function asyncReducer(state, data) {
   console.log('-------------- reducer')
   console.log('---------------------- current state', state)
   console.log('---------------------- new data', data)
@@ -19,15 +19,15 @@ function pokemonInfoReducer(state, data) {
   switch (data.type) {
     case 'pending': {
       // 🐨 replace "pokemon" with "data"
-      return {status: 'pending', pokemon: null, error: null}
+      return {status: 'pending', data: null, error: null}
     }
     case 'resolved': {
       // 🐨 replace "pokemon" with "data" (in the action too!)
-      return {status: 'resolved', pokemon: data.pokemon, error: null}
+      return {status: 'resolved', data: data.data, error: null}
     }
     case 'rejected': {
       // 🐨 replace "pokemon" with "data"
-      return {status: 'rejected', pokemon: null, error: data.error}
+      return {status: 'rejected', data: null, error: data.error}
     }
     default: {
       throw new Error(`Unhandled action type: ${data.type}`)
@@ -42,7 +42,12 @@ function useAsync(asyncAction, initialState, deps) {
     }, props.initialState = `,
     initialState,
   )
-  const [state, dispatch] = React.useReducer(pokemonInfoReducer, initialState)
+  const [state, dispatch] = React.useReducer(asyncReducer, {
+    status: 'idle',
+    data: null,
+    error: null,
+    ...initialState,
+  })
 
   React.useEffect(() => {
     console.log('useAsync effect')
@@ -55,8 +60,8 @@ function useAsync(asyncAction, initialState, deps) {
 
     dispatch({type: 'pending'})
     promise.then(
-      pokemon => {
-        dispatch({type: 'resolved', pokemon})
+      data => {
+        dispatch({type: 'resolved', data})
       },
       error => {
         dispatch({type: 'rejected', error})
@@ -77,15 +82,11 @@ function PokemonInfo({pokemonName}) {
       }
       return fetchPokemon(pokemonName)
     },
-    {
-      status: pokemonName ? 'pending' : 'idle',
-      pokemon: null,
-      error: null,
-    },
+    {status: pokemonName ? 'pending' : 'idle'},
     [pokemonName],
   )
   console.log('pokemonInfo state = ', state)
-  const {pokemon, status, error} = state
+  const {data: pokemon, status, error} = state
 
   switch (status) {
     case 'idle':
