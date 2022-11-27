@@ -8,6 +8,7 @@ const formatDate = date =>
 
 // the delay argument is for faking things out a bit
 function fetchPokemon(name, delay = 1500) {
+  console.log('fetchPokemon')
   const pokemonQuery = `
     query PokemonInfo($name: String) {
       pokemon(name: $name) {
@@ -40,6 +41,7 @@ function fetchPokemon(name, delay = 1500) {
       }),
     })
     .then(async response => {
+      console.log('fetchPokemon fetch() then')
       const {data} = await response.json()
       if (response.ok) {
         const pokemon = data?.pokemon
