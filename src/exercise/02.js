@@ -10,6 +10,7 @@ import {
   PokemonErrorBoundary,
 } from '../pokemon'
 
+//not neccessary anymore https://github.com/reactwg/react-18/discussions/82
 function useSafeDispatch(dispatch) {
   const mountedRef = React.useRef(false)
 
