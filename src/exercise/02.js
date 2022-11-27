@@ -11,26 +11,26 @@ import {
 } from '../pokemon'
 
 // 🐨 this is going to be our generic asyncReducer
-function asyncReducer(state, data) {
+function asyncReducer(state, action) {
   console.log('-------------- reducer')
   console.log('---------------------- current state', state)
-  console.log('---------------------- new data', data)
+  console.log('---------------------- new data', action)
 
-  switch (data.type) {
+  switch (action.type) {
     case 'pending': {
       // 🐨 replace "pokemon" with "data"
       return {status: 'pending', data: null, error: null}
     }
     case 'resolved': {
       // 🐨 replace "pokemon" with "data" (in the action too!)
-      return {status: 'resolved', data: data.data, error: null}
+      return {status: 'resolved', data: action.data, error: null}
     }
     case 'rejected': {
       // 🐨 replace "pokemon" with "data"
-      return {status: 'rejected', data: null, error: data.error}
+      return {status: 'rejected', data: null, error: action.error}
     }
     default: {
-      throw new Error(`Unhandled action type: ${data.type}`)
+      throw new Error(`Unhandled action type: ${action.type}`)
     }
   }
 }
